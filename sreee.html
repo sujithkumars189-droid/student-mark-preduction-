@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Mark Predictor</title>
+<style>
+  :root{
+    --bg:#0f1419;
+    --panel:#1a2230;
+    --accent:#5ee6b8;
+    --text:#e8edf2;
+    --muted:#8a99a8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    padding:40px 16px;
+  }
+  .card{
+    background:var(--panel);
+    border-radius:14px;
+    padding:32px;
+    width:100%;
+    max-width:480px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  h1{
+    font-size:1.5rem;
+    margin-top:0;
+    text-align:center;
+  }
+  label{
+    display:block;
+    margin:14px 0 6px;
+    font-size:.9rem;
+    color:var(--muted);
+  }
+  input,select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #2c3a4b;
+    background:#11171f;
+    color:var(--text);
+    font-size:1rem;
+  }
+  button{
+    width:100%;
+    margin-top:24px;
+    padding:12px;
+    border:none;
+    border-radius:8px; 
+    background:var(--accent);
+    color:#0f1419;
+    font-weight:bold;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  button:hover{opacity:.9;}
+  #result{
+    margin-top:22px;
+    text-align:center;
+    font-size:1.2rem;
+    min-height:1.5em;
+  }
+  #result .mark{
+    font-size:2.2rem;
+    color:var(--accent);
+    font-weight:bold;
+    display:block;
+  }
+</style>
+</head>
+<body>
+ 
+<div class="card">
+  <h1>Student Mark Predictor</h1>
+ 
+  <form id="predictForm">
+    <label for="subject">Subject</label>
+    <select id="subject">
+      <option>Mathematics</option>
+      <option>Science</option>
+      <option>English</option>
+      <option>Social Studies</option>
+      <option>Computer Science</option>
+    </select>
+ 
+    <label for="studyHours">Study Hours (per day)</label>
+    <input type="number" id="studyHours" min="0" max="24" step="0.5" placeholder="e.g. 3" required>
+ 
+    <label for="attendance">Attendance (%)</label>
+    <input type="number" id="attendance" min="0" max="100" step="1" placeholder="e.g. 85" required>
+ 
+    <label for="pastGrades">Past Grades (average %)</label>
+    <input type="number" id="pastGrades" min="0" max="100" step="1" placeholder="e.g. 75" required>
+ 
+    <button type="submit">Predict Mark</button>
+  </form>
+ 
+  <div id="result"></div>
+</div>
+ 
+<script>
+document.getElementById('predictForm').addEventListener('submit', function(e){
+  e.preventDefault();
+ 
+  const subject     = document.getElementById('subject').value;
+  const studyHours  = parseFloat(document.getElementById('studyHours').value);
+  const attendance  = parseFloat(document.getElementById('attendance').value);
+  const pastGrades  = parseFloat(document.getElementById('pastGrades').value);
+ 
+  // Simple weighted prediction formula
+  // Weights: study hours impact, attendance impact, past grades impact
+  const studyScore      = Math.min(studyHours * 8, 40);   // up to 40 points (5 hrs = max)
+  const attendanceScore = attendance * 0.3;               // up to 30 points
+  const pastGradeScore  = pastGrades * 0.3;                // up to 30 points
+ 
+  let predicted = studyScore + attendanceScore + pastGradeScore;
+  predicted = Math.min(Math.max(predicted, 0), 100);       // clamp 0-100
+ 
+  let grade;
+  if (predicted >= 90) grade = "A+";
+  else if (predicted >= 80) grade = "A";
+  else if (predicted >= 70) grade = "B";
+  else if (predicted >= 60) grade = "C";
+  else if (predicted >= 50) grade = "D";
+  else grade = "F";
+ 
+  document.getElementById('result').innerHTML =
+    `Predicted mark for <strong>${subject}</strong>:
+     <span class="mark">${predicted.toFixed(1)}%</span>
+     Grade: <strong>${grade}</strong>`;
+});
+</script>
+ 
+</body>
+</html>
